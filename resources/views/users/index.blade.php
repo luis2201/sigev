@@ -1,0 +1,13 @@
+@extends('layouts.app')
+@section('title', 'Usuarios y roles')
+@section('content')
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4"><p class="text-slate-500">Gestione las cuentas y sus permisos de acceso institucional.</p><a class="btn-primary" href="{{ route('users.create') }}">Crear usuario</a></div>
+<form action="{{ route('users.index') }}" method="get" class="card mb-6 grid gap-4 md:grid-cols-4">
+    <div><label for="q">Buscar usuario</label><input id="q" name="q" value="{{ request('q') }}" placeholder="Nombre, correo o identificación" maxlength="200"></div>
+    <div><label for="role">Rol</label><select id="role" name="role"><option value="">Todos los roles</option>@foreach($labels as $code => $label)<option value="{{ $code }}" @selected(request('role') === $code)>{{ $label }}</option>@endforeach</select></div>
+    <div><label for="status">Estado</label><select id="status" name="status"><option value="">Todos los estados</option>@foreach(['active'=>'Activo','inactive'=>'Inactivo','suspended'=>'Suspendido'] as $code => $label)<option value="{{ $code }}" @selected(request('status') === $code)>{{ $label }}</option>@endforeach</select></div>
+    <div class="flex items-end gap-3"><button class="btn-primary">Filtrar</button><a class="text-sm text-brand-700" href="{{ route('users.index') }}">Limpiar</a></div>
+</form>
+<div class="overflow-x-auto rounded-sm border border-slate-200 bg-white"><table class="w-full text-left text-sm"><caption class="sr-only">Cuentas institucionales</caption><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="p-4">Usuario</th><th class="p-4">Identificación</th><th class="p-4">Roles</th><th class="p-4">Estado</th><th class="p-4">Acciones</th></tr></thead><tbody class="divide-y divide-slate-100">@forelse($users as $account)<tr><td class="p-4"><p class="font-semibold">{{ $account->name }}</p><p class="text-slate-500">{{ $account->email }}</p></td><td class="p-4">{{ $account->identification_number }}</td><td class="p-4">{{ $account->roleLabel() }}</td><td class="p-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs">{{ ['active'=>'Activo','inactive'=>'Inactivo','suspended'=>'Suspendido'][$account->status] ?? $account->status }}</span></td><td class="p-4"><a class="font-semibold text-brand-700 underline-offset-4 hover:underline" href="{{ route('users.edit', $account) }}">Editar<span class="sr-only"> {{ $account->name }}</span></a></td></tr>@empty<tr><td colspan="5" class="p-10 text-center text-slate-500">No hay usuarios que coincidan con los filtros.</td></tr>@endforelse</tbody></table></div>
+<div class="mt-5">{{ $users->links() }}</div>
+@endsection

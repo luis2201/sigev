@@ -1,0 +1,9 @@
+@extends('layouts.app')
+@section('title', ($record->exists ? 'Editar ' : 'Registrar ').($kind==='careers' ? 'carrera' : 'período académico'))
+@section('content')
+<form class="card max-w-3xl space-y-5" action="{{ route('academic.'.$kind.'.'.($record->exists?'update':'store'),$record->exists?$record:[]) }}" method="post" onsubmit="return confirm('¿Confirma guardar los datos académicos? Si cierra un período, quedará bloqueado para cambios ordinarios.');">@csrf @if($record->exists) @method('put') @endif
+<div><label for="code">Código institucional</label><input id="code" name="code" value="{{ old('code',$record->code) }}" required maxlength="40"></div><div><label for="name">Nombre</label><input id="name" name="name" value="{{ old('name',$record->name) }}" required maxlength="{{ $kind==='careers'?200:150 }}"></div>
+@if($kind==='periods')<div class="grid gap-5 sm:grid-cols-2"><div><label for="starts_on">Fecha inicial</label><input id="starts_on" name="starts_on" type="date" required value="{{ old('starts_on',$record->starts_on?->format('Y-m-d')) }}"></div><div><label for="ends_on">Fecha final</label><input id="ends_on" name="ends_on" type="date" required value="{{ old('ends_on',$record->ends_on?->format('Y-m-d')) }}"></div></div>@endif
+<div><label for="status">Estado</label><select id="status" name="status">@foreach($kind==='careers'?['active'=>'Activo','inactive'=>'Inactivo']:['planned'=>'Planificado','active'=>'Activo','closed'=>'Cerrado'] as $v=>$label)<option value="{{ $v }}" @selected(old('status',$record->status ?? ($kind==='careers'?'active':'planned'))===$v)>{{ $label }}</option>@endforeach</select></div><p class="text-sm leading-6 text-slate-500">Los registros históricos se conservan. No se realizan eliminaciones físicas.</p><div class="flex gap-4"><button class="btn-primary">Guardar</button><a class="btn-secondary" href="{{ route('academic.'.$kind.'.index') }}">Cancelar</a></div>
+</form>
+@endsection

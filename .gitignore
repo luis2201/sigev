@@ -1,0 +1,54 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/fonts-manifest.dev.json
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+Thumbs.db
+
+# Secretos y configuraciones locales
+.env.*
+!.env.example
+/auth.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Datos locales, evidencias y exportaciones privadas
+/storage/app/*
+!/storage/app/.gitignore
+/database/*.sqlite
+/database/*.sqlite-*
+/database/*.sql
+/database/*.sql.gz
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Referencia institucional con datos personales e imágenes
+/docs/INFORME SALUD COMUNITARIA (ENFERMERIA).docx

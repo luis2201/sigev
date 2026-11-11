@@ -1,0 +1,4129 @@
+{
+  "status": "propuesta_no_ejecutable",
+  "date": "2026-11-09",
+  "tables": [
+    {
+      "name": "users",
+      "domain": "Identidad",
+      "purpose": "Identidad única global; aprovechar el modelo nativo Laravel.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(200)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Nombre completo"
+        },
+        {
+          "name": "identification_type",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "cedula, pasaporte u otro; catálogo por definir"
+        },
+        {
+          "name": "identification_number",
+          "type": "VARCHAR(30)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Normalizada; conservar ceros"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(254)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Institucional normalizado en minúsculas"
+        },
+        {
+          "name": "email_verified_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "password",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Solo hash; nunca identificación en claro como contraseña"
+        },
+        {
+          "name": "must_change_password",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": "Booleano"
+        },
+        {
+          "name": "password_changed_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": "active, suspended, inactive"
+        },
+        {
+          "name": "remember_token",
+          "type": "VARCHAR(100)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": "Compatibilidad Laravel"
+        },
+        {
+          "name": "last_login_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": "NULL solo alta inicial controlada"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "email; (identification_type, identification_number)",
+      "indexes": "(status)",
+      "rules": "CHECK booleano y estado. La política de equivalencia entre tipos de identificación se valida en importación; prohibir crear una segunda persona ante conflicto."
+    },
+    {
+      "name": "roles",
+      "domain": "Identidad",
+      "purpose": "Cuatro roles institucionales.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(30)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "admin, coordinator, tutor, student"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(100)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "code",
+      "indexes": "",
+      "rules": "CHECK code IN los cuatro códigos; no dar al administrador aprobación académica implícita."
+    },
+    {
+      "name": "role_user",
+      "domain": "Identidad",
+      "purpose": "Pivote Laravel con vigencia auditable de la asignación de rol.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "role_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "roles.id",
+          "note": ""
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "assigned_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "assigned_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "revoked_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(role_id,user_id)",
+      "indexes": "(user_id,revoked_at)",
+      "rules": "Reactivar el mismo pivote con evento de auditoría; conservar cada ciclo en audit_events. Un único coordinador activo se verifica con bloqueo de la fila roles correspondiente; combinaciones de roles pendientes de política."
+    },
+    {
+      "name": "students",
+      "domain": "Personas",
+      "purpose": "Perfil académico global sin fijar aquí una carrera que sobrescriba el pasado.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "internal_code",
+          "type": "VARCHAR(50)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "user_id; internal_code",
+      "indexes": "(status)",
+      "rules": "Carrera histórica en student_career_records y participation; no duplicar nombres ni correo."
+    },
+    {
+      "name": "teachers",
+      "domain": "Personas",
+      "purpose": "Perfil docente; creación atómica con cuenta y rol.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "academic_title",
+          "type": "VARCHAR(150)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "user_id",
+      "indexes": "(status)",
+      "rules": "Alta solo administrador o coordinador; usuario activo con rol tutor para nuevas asignaciones."
+    },
+    {
+      "name": "careers",
+      "domain": "Académico",
+      "purpose": "Catálogo global de carreras.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(40)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(200)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "code",
+      "indexes": "(status)",
+      "rules": "Desactivar sin borrar referencias históricas."
+    },
+    {
+      "name": "academic_periods",
+      "domain": "Académico",
+      "purpose": "Contexto temporal administrado exclusivamente por administrador.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(40)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(150)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "starts_on",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "ends_on",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "planned",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "closed_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "closed_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "code",
+      "indexes": "(status,starts_on)",
+      "rules": "CHECK ends_on >= starts_on; estado planned/active/closed; closed exige closed_at y closed_by. Cierre con pendientes: decisión institucional pendiente."
+    },
+    {
+      "name": "student_career_records",
+      "domain": "Académico",
+      "purpose": "Historial de pertenencia académica; admite carreras simultáneas sin presumir que se permiten.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "student_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "students.id",
+          "note": ""
+        },
+        {
+          "name": "career_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "careers.id",
+          "note": ""
+        },
+        {
+          "name": "valid_from",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_until",
+          "type": "DATE",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "recorded_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(student_id,career_id,valid_from); (id,student_id,career_id)",
+      "indexes": "(student_id,valid_from,valid_until)",
+      "rules": "CHECK fin NULL o > inicio; semántica [desde,hasta). No solapar misma pareja estudiante/carrera bajo lock del estudiante. Simultaneidad de carreras pendiente."
+    },
+    {
+      "name": "projects",
+      "domain": "Académico",
+      "purpose": "Proyecto por período; sin imponer un único proyecto por carrera.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "career_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "careers.id",
+          "note": ""
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(50)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(academic_period_id,code); (id,academic_period_id)",
+      "indexes": "(career_id,status)",
+      "rules": "Si career_id no NULL, solo participaciones de esa carrera. Proyecto nullable en participación solo durante preparación; obligatorio antes de jornadas y perteneciente al mismo período. Varios proyectos en catálogo no habilitan múltiples participaciones del mismo estudiante/período."
+    },
+    {
+      "name": "participations",
+      "domain": "Académico",
+      "purpose": "Expediente único del estudiante por período académico, con una carrera y un solo proyecto; raíz de jornadas e informe.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "student_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "students.id",
+          "note": ""
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "career_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "careers.id",
+          "note": ""
+        },
+        {
+          "name": "student_career_record_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "student_career_records.id",
+          "note": ""
+        },
+        {
+          "name": "project_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "projects.id",
+          "note": "NULL solo en preparación; proyecto válido del mismo período obligatorio antes de jornadas. Sin cambio libre con jornadas o aprobaciones históricas."
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "registered_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "registered_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(student_id,academic_period_id); (id,academic_period_id); (id,student_id)",
+      "indexes": "(academic_period_id,student_id); (academic_period_id,career_id,status); (project_id)",
+      "rules": "UNIQUE (student_id, academic_period_id) garantiza una sola participación por estudiante y período incluso ante concurrencia, independientemente de carrera, proyecto o estado. project_id admite NULL solo en preparación; antes de iniciar jornadas debe identificar un proyecto válido del mismo período mediante la FK compuesta (project_id,academic_period_id) → projects(id,academic_period_id). No cambiar libremente el proyecto si existen jornadas o aprobaciones históricas; cualquier excepción requiere procedimiento administrativo aún no definido, sin habilitación implícita. Reimportar reutiliza cuenta sin cambiar contraseña y participación si coinciden carrera y proyecto; diferencias son conflicto administrativo, sin sobrescribir historia. Reasignación de tutor conserva participación. Máximo un informe con UNIQUE (participation_id); correcciones mediante versiones. Una jornada diaria con UNIQUE (participation_id, local_date), N intervalos y aprobación de jornada completa."
+    },
+    {
+      "name": "private_files",
+      "domain": "Archivos",
+      "purpose": "Metadatos privados comunes a fotos, respaldos, plantillas y exportaciones.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "disk",
+          "type": "VARCHAR(40)",
+          "null": "No",
+          "default": "local",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "storage_key",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "mime_type",
+          "type": "VARCHAR(100)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "size_bytes",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "sha256",
+          "type": "CHAR(64)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "uploaded_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "staged",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "purged_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(disk,storage_key)",
+      "indexes": "(status,created_at); (sha256)",
+      "rules": "CHECK size_bytes>0; staged/ready/quarantined/purged. Autor NULL solo proceso sistema auditable. Hash no único: archivos idénticos no comparten permisos automáticamente. Ruta binaria utf8mb4_bin. No guardar nombre original si contiene datos sensibles."
+    },
+    {
+      "name": "student_imports",
+      "domain": "Importaciones",
+      "purpose": "Lote de importación con contexto académico y resultado.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "career_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "careers.id",
+          "note": ""
+        },
+        {
+          "name": "project_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "projects.id",
+          "note": ""
+        },
+        {
+          "name": "source_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "requested_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "pending",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "started_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "completed_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "error_summary",
+          "type": "VARCHAR(1000)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "idempotency_key",
+      "indexes": "(academic_period_id,status,created_at)",
+      "rules": "Contadores derivados de filas, no duplicados. FK compuesta proyecto/período. Archivo original privado con retención limitada. Reutilizar usuario sin modificar contraseña; buscar participación por estudiante/período, reutilizar si carrera y proyecto coinciden; diferencias son conflicto administrativo, sin sobrescritura histórica."
+    },
+    {
+      "name": "student_import_rows",
+      "domain": "Importaciones",
+      "purpose": "Resultado por fila; sin contraseñas ni copias permanentes del archivo.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "student_import_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "student_imports.id",
+          "note": ""
+        },
+        {
+          "name": "row_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "row_fingerprint",
+          "type": "CHAR(64)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "student_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "students.id",
+          "note": ""
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "pending",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "errors",
+          "type": "JSON",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "processed_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(student_import_id,row_number)",
+      "indexes": "(student_import_id,status)",
+      "rules": "CHECK row_number>0. pending/valid/created/reused/error. errors solo códigos y columnas; no credenciales. Idempotencia de fila dentro del lote; cross-lote requiere resolución de identidad y participación. Coincidencia: reused; carrera/proyecto diferentes: error con código career_conflict/project_conflict, incluso NULL frente a proyecto informado. Conservar resultado de cada fila y no duplicar participación. Tras conflicto UNIQUE concurrente releer y comparar."
+    },
+    {
+      "name": "host_institutions",
+      "domain": "Coordinación",
+      "purpose": "Catálogo de instituciones receptoras.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(50)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "address",
+          "type": "VARCHAR(500)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "province",
+          "type": "VARCHAR(100)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "canton",
+          "type": "VARCHAR(100)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "code",
+      "indexes": "(status,name)",
+      "rules": "Renombrar catálogo no modifica snapshots históricos de configuración."
+    },
+    {
+      "name": "institution_areas",
+      "domain": "Coordinación",
+      "purpose": "Áreas o departamentos de una institución.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "host_institution_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "host_institutions.id",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(150)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(host_institution_id,name); (id,host_institution_id)",
+      "indexes": "",
+      "rules": "No aceptar un área de institución distinta."
+    },
+    {
+      "name": "placement_groups",
+      "domain": "Coordinación",
+      "purpose": "Agrupación de participaciones del mismo período.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(150)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(academic_period_id,name); (id,academic_period_id)",
+      "indexes": "(academic_period_id,status)",
+      "rules": "Grupo no implica compartir horas acumuladas ni informe."
+    },
+    {
+      "name": "group_memberships",
+      "domain": "Coordinación",
+      "purpose": "Membresía histórica por participación.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "placement_group_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "placement_groups.id",
+          "note": ""
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "valid_from",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_until",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "assigned_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(placement_group_id,participation_id,valid_from)",
+      "indexes": "(participation_id,valid_from,valid_until)",
+      "rules": "CHECK fin > inicio. FK compuestas mismo período; impedir membresías simultáneas incompatibles en transacción."
+    },
+    {
+      "name": "tutor_assignments",
+      "domain": "Coordinación",
+      "purpose": "Historial de tutor responsable del expediente.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "teacher_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "teachers.id",
+          "note": ""
+        },
+        {
+          "name": "valid_from",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_until",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "assigned_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(participation_id,valid_from); (id,participation_id)",
+      "indexes": "(teacher_id,valid_until); (participation_id,valid_from,valid_until)",
+      "rules": "CHECK fin > inicio. Una vigencia efectiva por participación; bloquear participación al reasignar. Autores históricos nunca se recalculan con tutor actual."
+    },
+    {
+      "name": "placement_configurations",
+      "domain": "Coordinación",
+      "purpose": "Versión inmutable de condiciones; compartible por grupos o usada individualmente.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "placement_group_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "placement_groups.id",
+          "note": ""
+        },
+        {
+          "name": "host_institution_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "host_institutions.id",
+          "note": ""
+        },
+        {
+          "name": "institution_area_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "institution_areas.id",
+          "note": ""
+        },
+        {
+          "name": "configuration_key",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "version_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "institution_name_snapshot",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "address_snapshot",
+          "type": "VARCHAR(500)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "area_name_snapshot",
+          "type": "VARCHAR(150)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "institutional_tutor_name",
+          "type": "VARCHAR(200)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "practice_starts_on",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "practice_ends_on",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "required_minutes",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_from",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_until",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(configuration_key,version_number); (id,academic_period_id)",
+      "indexes": "(academic_period_id,valid_from,valid_until); (placement_group_id)",
+      "rules": "CHECK required_minutes>0; version_number>0; fechas válidas. Minutos evita horas decimales. Snapshots justifican historial. Cambios crean versión nueva; cerrar vigencia es única actualización permitida."
+    },
+    {
+      "name": "participation_configurations",
+      "domain": "Coordinación",
+      "purpose": "Aplicación temporal individual de una configuración.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "placement_configuration_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "placement_configurations.id",
+          "note": ""
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "valid_from",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_until",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "assigned_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "VARCHAR(1000)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(participation_id,valid_from); (id,participation_id)",
+      "indexes": "(participation_id,valid_from,valid_until)",
+      "rules": "CHECK fin > inicio; FK compuestas mismo período; exactamente una configuración efectiva para poder marcar. No exigir que exista antes de completar asignación."
+    },
+    {
+      "name": "schedule_intervals",
+      "domain": "Horarios",
+      "purpose": "Múltiples tramos diarios de una versión de configuración.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "placement_configuration_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "placement_configurations.id",
+          "note": ""
+        },
+        {
+          "name": "weekday",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "starts_at",
+          "type": "TIME(0)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "ends_at",
+          "type": "TIME(0)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_from",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "valid_until",
+          "type": "DATE",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(placement_configuration_id,weekday,starts_at,valid_from); (id,placement_configuration_id)",
+      "indexes": "(placement_configuration_id,weekday,status,valid_from,valid_until)",
+      "rules": "CHECK weekday BETWEEN 1 AND 7; 00:00:00<=starts_at<ends_at<24:00:00; fin vigencia > inicio. Horas civiles America/Guayaquil, sin cruce de medianoche inicialmente. Bloquear configuración y detectar superposición tanto de hora como de vigencia."
+    },
+    {
+      "name": "attendance_days",
+      "domain": "Jornadas",
+      "purpose": "Una jornada diaria por participación; unidad completa de aprobación.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "local_date",
+          "type": "DATE",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(25)",
+          "null": "No",
+          "default": "in_progress",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "current_review_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "attendance_reviews.id",
+          "note": ""
+        },
+        {
+          "name": "closed_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "revision_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(participation_id,local_date); (id,participation_id); current_review_id",
+      "indexes": "(status,local_date)",
+      "rules": "Estado in_progress/pending/observed/approved/exceptional/rejected. Puntero decisión efectiva compuesto; aprobar solo día cerrado sin intervalos abiertos ni futuros pendientes del día. No crear jornada por ausencia total de marcas."
+    },
+    {
+      "name": "attendance_intervals",
+      "domain": "Jornadas",
+      "purpose": "Marcación por tramo y copia histórica de límites autorizados.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "attendance_day_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "attendance_days.id",
+          "note": ""
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "participation_configuration_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participation_configurations.id",
+          "note": ""
+        },
+        {
+          "name": "placement_configuration_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "placement_configurations.id",
+          "note": ""
+        },
+        {
+          "name": "schedule_interval_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "schedule_intervals.id",
+          "note": ""
+        },
+        {
+          "name": "authorized_start_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "authorized_end_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "actual_entry_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "actual_exit_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "provisional_closed_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "closure_type",
+          "type": "VARCHAR(20)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "mark_status",
+          "type": "VARCHAR(25)",
+          "null": "No",
+          "default": "open",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "computable_minutes",
+          "type": "DECIMAL(10,6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(attendance_day_id,schedule_interval_id)",
+      "indexes": "(participation_id,mark_status); (mark_status,authorized_end_at)",
+      "rules": "Computables NULL mientras abierto; snapshot al cerrar, nunca contador libre. CHECK límites/orden y cierres descritos en reglas. FKs compuestas evitan tramo y configuración ajenos; no modificar al revisar."
+    },
+    {
+      "name": "activities",
+      "domain": "Actividades",
+      "purpose": "Actividad durante un intervalo real, dentro de su jornada.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "attendance_interval_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "attendance_intervals.id",
+          "note": ""
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "registered_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "draft",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "",
+      "indexes": "(attendance_interval_id,registered_at)",
+      "rules": "Jornada y estudiante se derivan del intervalo. draft/complete/void; complete requiere foto ready. Guardado ordinario atómico con evidencia. No actividad retroactiva."
+    },
+    {
+      "name": "activity_evidences",
+      "domain": "Actividades",
+      "purpose": "Una fotografía propia por actividad ordinaria.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "activity_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "activities.id",
+          "note": ""
+        },
+        {
+          "name": "private_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "activity_id; private_file_id",
+      "indexes": "",
+      "rules": "La evidencia no puede reutilizarse como registro de otra actividad. Archivo foto validado, privado y ready; ancho/tamaño máximos pendientes de política."
+    },
+    {
+      "name": "attendance_incidents",
+      "domain": "Supervisión",
+      "purpose": "Incidencias y justificaciones verificables.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "attendance_day_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "attendance_days.id",
+          "note": ""
+        },
+        {
+          "name": "attendance_interval_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "attendance_intervals.id",
+          "note": ""
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(30)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "observation",
+          "type": "TEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "student_justification",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "support_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "support_reference",
+          "type": "VARCHAR(1000)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "recorded_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "",
+      "indexes": "(attendance_day_id,kind)",
+      "rules": "missing_exit/no_activities/mark_error/other; NULL actor solo Scheduler. Intervalo opcional debe pertenecer al día. No implica aprobación; soporte excepcional puede ser archivo privado o referencia verificable."
+    },
+    {
+      "name": "attendance_reviews",
+      "domain": "Supervisión",
+      "purpose": "Decisiones inmutables de jornada; solo la apuntada acredita.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "attendance_day_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "attendance_days.id",
+          "note": ""
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "tutor_assignment_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "tutor_assignments.id",
+          "note": ""
+        },
+        {
+          "name": "reviewed_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "sequence_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "decision",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "justification",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "support_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "support_reference",
+          "type": "VARCHAR(1000)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "approved_minutes",
+          "type": "DECIMAL(10,6)",
+          "null": "No",
+          "default": "0",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "computable_minutes_snapshot",
+          "type": "DECIMAL(10,6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "day_revision_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reviewed_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "(attendance_day_id,sequence_number); (id,attendance_day_id)",
+      "indexes": "(tutor_assignment_id,reviewed_at)",
+      "rules": "ordinary/exceptional/observed/rejected/reopened; CHECK 0<=approved<=snapshot; no aprobada => approved=0; exceptional requiere justificación y respaldo. ordinaria exige todas las actividades ordinarias completas, al menos una. Snapshot derivado justificado por decisión histórica."
+    },
+    {
+      "name": "attendance_events",
+      "domain": "Supervisión",
+      "purpose": "Transiciones de jornada y cierre automático sin alterar revisiones.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "attendance_day_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "attendance_days.id",
+          "note": ""
+        },
+        {
+          "name": "actor_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "from_status",
+          "type": "VARCHAR(25)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "to_status",
+          "type": "VARCHAR(25)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "",
+      "indexes": "(attendance_day_id,occurred_at)",
+      "rules": "Solo anexar. Identidad NULL para sistema, acción diferenciada en auditoría; no sumar minutos aquí."
+    },
+    {
+      "name": "report_templates",
+      "domain": "Informes",
+      "purpose": "Versiones de una única plantilla institucional universal.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "version_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "source_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "structure",
+          "type": "JSON",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "draft",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "published_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "published_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "version_number",
+      "indexes": "(status)",
+      "rules": "No plantilla por carrera; structure define secciones/obligatoriedad, no contenido de estudiantes; inmutable publicada."
+    },
+    {
+      "name": "reports",
+      "domain": "Informes",
+      "purpose": "Como máximo un informe por participación; correcciones mediante versiones del mismo informe.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "participations.id",
+          "note": ""
+        },
+        {
+          "name": "report_template_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_templates.id",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "draft",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "submitted_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "approved_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "lock_version",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "participation_id",
+      "indexes": "(status,created_at)",
+      "rules": "draft/review/submitted/approved/reopened/archived. Borrador permitido durante jornadas. Cierre exige reglas completas; portada no editable por estudiante. UNIQUE (participation_id) conserva cardinalidad 1 a 0..1; corregir no crea otro informe."
+    },
+    {
+      "name": "report_sections",
+      "domain": "Informes",
+      "purpose": "Secciones instanciadas según plantilla; identificadores estables.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "reports.id",
+          "note": ""
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(50)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(150)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "position",
+          "type": "SMALLINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "is_required",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (report_id,code); (id,report_id)",
+      "indexes": "(report_id,position)",
+      "rules": "No almacenar porcentaje ni estado agregado; derivar de campos. Obligatorio definido por versión de plantilla."
+    },
+    {
+      "name": "report_objectives",
+      "domain": "Informes",
+      "purpose": "Identificador estable de cada objetivo específico y su correspondencia.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "reports.id",
+          "note": ""
+        },
+        {
+          "name": "position",
+          "type": "SMALLINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "is_active",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (id,report_id)",
+      "indexes": "(report_id,is_active,position)",
+      "rules": "No usar orden como FK ni borrar objetivos con versiones; desactivar con motivo auditado y reaprobación del informe. Cuatro campos por objetivo, creados juntos."
+    },
+    {
+      "name": "report_fields",
+      "domain": "Informes",
+      "purpose": "Unidad individual de redacción y revisión; contenido solo en versiones.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "reports.id",
+          "note": ""
+        },
+        {
+          "name": "report_section_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_sections.id",
+          "note": ""
+        },
+        {
+          "name": "report_objective_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "report_objectives.id",
+          "note": ""
+        },
+        {
+          "name": "field_key",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(30)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "position",
+          "type": "SMALLINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "is_required",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "is_active",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "1",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "empty",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "current_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "current_decision_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "report_field_decisions.id",
+          "note": ""
+        },
+        {
+          "name": "singleton_kind",
+          "type": "VARCHAR(30)",
+          "null": "Sí",
+          "default": "Generada PERSISTENT",
+          "fk": "",
+          "note": "CASE singleton descrito en reglas"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "(report_id,field_key); (report_id,report_objective_id,kind); (report_id,singleton_kind); (id,report_id); current_version_id; current_decision_id",
+      "indexes": "(report_section_id,position); (report_id,status,is_active)",
+      "rules": "FK compuestas: sección y objetivo del mismo informe; punteros versión/decisión del mismo campo. singleton_kind no es FK. Estado empty/draft/pending/observed/corrected/approved; publicación exige current_decision que aprueba current_version."
+    },
+    {
+      "name": "report_field_versions",
+      "domain": "Revisión académica",
+      "purpose": "Contenido inmutable de un campo; también raíz de estructuras revisables.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_field_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_fields.id",
+          "note": ""
+        },
+        {
+          "name": "version_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "content",
+          "type": "LONGTEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "recommendation_target",
+          "type": "VARCHAR(20)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "authored_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "submitted_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (report_field_id,version_number); (id,report_field_id)",
+      "indexes": "(report_field_id,created_at)",
+      "rules": "Texto para campos redactados; NULL permitido para estructuras/borrador vacío. recommendation_target institution/career solo para recomendación; comprobar tipo en servicio. Referencias/budget/anexos son filas hijas de esta versión, no otra fuente de texto."
+    },
+    {
+      "name": "academic_comments",
+      "domain": "Revisión académica",
+      "purpose": "Hilos por campo y versión, incluyendo respuestas del estudiante.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_field_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_fields.id",
+          "note": ""
+        },
+        {
+          "name": "report_field_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "parent_comment_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "academic_comments.id",
+          "note": ""
+        },
+        {
+          "name": "author_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "resolved_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "resolved_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (id,report_field_id)",
+      "indexes": "(report_field_id,created_at); (report_field_id,resolved_at)",
+      "rules": "Padre del mismo campo; respuesta puede referir versión posterior del mismo campo. Texto inmutable; resolución auditada. Resolver hilo no equivale a aprobar campo."
+    },
+    {
+      "name": "report_field_decisions",
+      "domain": "Revisión académica",
+      "purpose": "Decisión inmutable por versión, incluidas reaperturas justificadas.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_field_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_fields.id",
+          "note": ""
+        },
+        {
+          "name": "report_field_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "tutor_assignment_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "tutor_assignments.id",
+          "note": ""
+        },
+        {
+          "name": "decided_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "sequence_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "decision",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "decided_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (report_field_id,sequence_number); (id,report_field_id)",
+      "indexes": "(tutor_assignment_id,decided_at)",
+      "rules": "approve/observe/reopen; observe/reopen exige motivo. CHECK texto no vacío cuando obligatorio. Puntero vigente en fields; nueva versión no hereda aprobación."
+    },
+    {
+      "name": "report_events",
+      "domain": "Revisión académica",
+      "purpose": "Historia del informe completo, entregas y reaperturas.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "reports.id",
+          "note": ""
+        },
+        {
+          "name": "actor_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR(30)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "",
+      "indexes": "(report_id,occurred_at)",
+      "rules": "Solo anexar; no duplicar contenido redactado en eventos."
+    },
+    {
+      "name": "bibliography_entries",
+      "domain": "Informes estructurados",
+      "purpose": "Referencia bibliográfica de una versión de campo tipo bibliography_entry.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_field_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "citation",
+          "type": "TEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "url",
+          "type": "VARCHAR(2048)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "accessed_on",
+          "type": "DATE",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "report_field_version_id",
+      "indexes": "",
+      "rules": "Cada referencia es un campo estable revisable con versiones; citation fuente canónica, no copiarla también en content."
+    },
+    {
+      "name": "report_annexes",
+      "domain": "Informes estructurados",
+      "purpose": "Archivo y leyenda de una versión de campo tipo annex.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_field_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "private_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "caption",
+          "type": "VARCHAR(1000)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "source_activity_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "activities.id",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "report_field_version_id",
+      "indexes": "(private_file_id)",
+      "rules": "Si deriva de evidencia, comprobar misma participación y archivo correspondiente. Sin duplicar bytes; evidencia referenciada no se purga mientras haya documento vigente."
+    },
+    {
+      "name": "budget_items",
+      "domain": "Informes estructurados",
+      "purpose": "Partidas de la versión del campo único budget.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_field_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "position",
+          "type": "SMALLINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "description",
+          "type": "VARCHAR(500)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "quantity",
+          "type": "DECIMAL(12,3)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "unit_price",
+          "type": "DECIMAL(14,4)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "currency",
+          "type": "CHAR(3)",
+          "null": "No",
+          "default": "USD",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (report_field_version_id,position)",
+      "indexes": "",
+      "rules": "CHECK quantity>0 y unit_price>=0. Total por línea y global derivado; redondeo a 2 decimales por línea como propuesta por confirmar. No almacenar totales duplicados; nueva versión copia conjunto completo para revisión."
+    },
+    {
+      "name": "report_releases",
+      "domain": "Documentos",
+      "purpose": "Snapshot inmutable de entrega aprobada para producir Word y PDF.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "reports.id",
+          "note": ""
+        },
+        {
+          "name": "release_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "cover_snapshot",
+          "type": "JSON",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "approved_minutes_snapshot",
+          "type": "DECIMAL(12,6)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "required_minutes_snapshot",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "snapshot_sha256",
+          "type": "CHAR(64)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "revoked_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "revocation_reason",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (report_id,release_number); (id,report_id)",
+      "indexes": "(report_id,revoked_at)",
+      "rules": "Portada histórica y umbral congelados justifican copia. Manifest de campos en release_fields; portada generada de participación/configuración, sin claves ni credenciales. Reapertura revoca vigencia para nuevas exportaciones; conserva anteriores."
+    },
+    {
+      "name": "report_release_fields",
+      "domain": "Documentos",
+      "purpose": "Manifest relacional exacto de versiones y aprobaciones del snapshot.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_release_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_releases.id",
+          "note": ""
+        },
+        {
+          "name": "report_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "reports.id",
+          "note": ""
+        },
+        {
+          "name": "report_field_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_fields.id",
+          "note": ""
+        },
+        {
+          "name": "report_field_version_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_versions.id",
+          "note": ""
+        },
+        {
+          "name": "report_field_decision_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_field_decisions.id",
+          "note": ""
+        },
+        {
+          "name": "section_position",
+          "type": "SMALLINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "field_position",
+          "type": "SMALLINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": " (report_release_id,report_field_id)",
+      "indexes": "(report_field_version_id)",
+      "rules": "FK compuestas del mismo informe/campo. Decisión approve de esa versión verificada en transacción; manifest inmutable. Posiciones congeladas para evitar exportación distinta tras reordenar."
+    },
+    {
+      "name": "document_exports",
+      "domain": "Documentos",
+      "purpose": "Trabajo idempotente y versión de archivo por formato.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "report_release_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "report_releases.id",
+          "note": ""
+        },
+        {
+          "name": "requested_by",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "format",
+          "type": "VARCHAR(4)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "generation_number",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "queued",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "private_file_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "private_files.id",
+          "note": ""
+        },
+        {
+          "name": "started_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "generated_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "expires_at",
+          "type": "DATETIME(6)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "error_code",
+          "type": "VARCHAR(100)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Última actualización; solo entidades mutables"
+        }
+      ],
+      "unique": "idempotency_key; (report_release_id,format,generation_number); private_file_id",
+      "indexes": "(status,created_at)",
+      "rules": "format docx/pdf; queued/processing/ready/failed/expired. ready exige archivo y generated_at; worker reintenta mismo registro, no nueva versión. No guardar rutas o secretos en errores."
+    },
+    {
+      "name": "audit_events",
+      "domain": "Auditoría",
+      "purpose": "Registro transversal anexable sin secretos.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "actor_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "users.id",
+          "note": ""
+        },
+        {
+          "name": "academic_period_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "academic_periods.id",
+          "note": ""
+        },
+        {
+          "name": "action",
+          "type": "VARCHAR(100)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "entity_type",
+          "type": "VARCHAR(80)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "entity_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "request_id",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "changes",
+          "type": "JSON",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": "Creación"
+        }
+      ],
+      "unique": "",
+      "indexes": "(academic_period_id,occurred_at); (entity_type,entity_id,occurred_at); (actor_id,occurred_at); (request_id)",
+      "rules": "Referencia polimórfica deliberadamente sin FK; entity_type en allowlist. actor NULL solo sistema. changes por lista de campos permitidos; excluir passwords/tokens/payloads sensibles. Sin UPDATE/DELETE ordinarios."
+    },
+    {
+      "name": "password_reset_tokens",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Recuperación nativa de acceso.",
+      "fields": [
+        {
+          "name": "email",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "PK; correo normalizado"
+        },
+        {
+          "name": "token",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Hash del token"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "(created_at)",
+      "rules": "PK email; sin FK para conservar integración Laravel; servicio invalida token al cambiar correo, usar token o vencer plazo."
+    },
+    {
+      "name": "sessions",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Sesiones del controlador database.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "user_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": "Referencia lógica users.id como migración nativa; índice sin FK"
+        },
+        {
+          "name": "ip_address",
+          "type": "VARCHAR(45)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "user_agent",
+          "type": "TEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "payload",
+          "type": "LONGTEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "last_activity",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "user_id; last_activity",
+      "rules": "PK id; datos sensibles operativos fuera de auditoría. Retención de sesiones vencidas; no publicar payload."
+    },
+    {
+      "name": "cache",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Caché de Laravel.",
+      "fields": [
+        {
+          "name": "key",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "value",
+          "type": "MEDIUMTEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "expiration",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "expiration",
+      "rules": "PK key; expiration índice propuesto para limpieza."
+    },
+    {
+      "name": "cache_locks",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Locks de caché; no sustituyen transacciones.",
+      "fields": [
+        {
+          "name": "key",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "owner",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "expiration",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "expiration",
+      "rules": "PK key."
+    },
+    {
+      "name": "jobs",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Cola database.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "queue",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "payload",
+          "type": "LONGTEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "attempts",
+          "type": "TINYINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "reserved_at",
+          "type": "INT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "available_at",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "queue",
+      "rules": "Nativa; payload sin contraseñas; pasar IDs, no fotos ni entidades completas."
+    },
+    {
+      "name": "job_batches",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Lotes opcionales de cola.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "total_jobs",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "pending_jobs",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "failed_jobs",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "failed_job_ids",
+          "type": "LONGTEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "options",
+          "type": "MEDIUMTEXT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "cancelled_at",
+          "type": "INT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "finished_at",
+          "type": "INT",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "",
+      "rules": "PK id; mantener formato esperado por Laravel."
+    },
+    {
+      "name": "failed_jobs",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Fallos operativos de cola.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "uuid",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "connection",
+          "type": "TEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "queue",
+          "type": "TEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "payload",
+          "type": "LONGTEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "exception",
+          "type": "LONGTEXT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "failed_at",
+          "type": "TIMESTAMP",
+          "null": "No",
+          "default": "CURRENT_TIMESTAMP",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "uuid",
+      "indexes": "(connection(191),queue(191),failed_at)",
+      "rules": "Índice con prefijos propuesto para TEXT; revisar índice nativo al implementar. Excepciones pueden contener datos personales: sanitizar y limitar acceso/retención."
+    },
+    {
+      "name": "migrations",
+      "domain": "Infraestructura Laravel",
+      "purpose": "Control técnico creado por migrador cuando se autorice.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "migration",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "batch",
+          "type": "INT",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "",
+      "indexes": "",
+      "rules": "No contiene negocio. No crear ni ejecutar en esta intervención."
+    }
+  ],
+  "confirmed_participation_rule": {
+    "source": "SIGEV-ITSUP Prompt 003",
+    "unique": [
+      "student_id",
+      "academic_period_id"
+    ],
+    "project_nullable_during_preparation": true,
+    "project_required_before_attendance": true,
+    "project_same_academic_period": true,
+    "project_change_with_attendance_or_historical_approvals": "rechazado_en_flujo_ordinario",
+    "import_mismatch": "error_conflicto_administrativo_sin_sobrescritura",
+    "report_unique": [
+      "participation_id"
+    ],
+    "attendance_day_unique": [
+      "participation_id",
+      "local_date"
+    ]
+  }
+}

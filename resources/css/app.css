@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: Arial, 'Helvetica Neue', sans-serif;
+    --color-brand-50: #f0f4fc;
+    --color-brand-100: #e2eafb;
+    --color-brand-200: #c4d5f4;
+    --color-brand-300: #9cb9e8;
+    --color-brand-400: #6d96da;
+    --color-brand-500: #4276c8;
+    --color-brand-600: #285db5;
+    --color-brand-700: #204fa4;
+    --color-brand-800: #1b428a;
+    --color-brand-900: #18386d;
+    --color-institution-red: #f43817;
+}
+
+@layer base {
+    body { @apply font-sans text-slate-800 antialiased; }
+    button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    button, select { cursor: pointer; }
+    input[type='checkbox'] { accent-color: var(--color-brand-700); }
+    :focus-visible { outline: 2px solid var(--color-brand-700); outline-offset: 3px; }
+}
+
+@layer components {
+    label { @apply mb-2 block text-sm font-semibold text-slate-700; }
+    input:not([type='checkbox']), select, textarea { @apply block w-full rounded-xs border border-slate-300 bg-white px-3 py-3 text-sm outline-none transition focus:border-brand-700 focus:ring-2 focus:ring-brand-100; }
+    .btn-primary { @apply inline-flex items-center justify-center gap-4 rounded-xs border border-brand-700 bg-brand-700 px-5 py-3 text-sm font-semibold text-white transition hover:border-brand-900 hover:bg-brand-900; }
+    .btn-secondary { @apply inline-flex items-center justify-center rounded-xs border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-brand-700 hover:text-brand-700; }
+    .card { @apply rounded-xs border border-slate-200 bg-white p-6; }
+    .institution-header { @apply flex items-center justify-between gap-5 border-t-4 border-brand-700 bg-white px-6 py-5; }
+    .institution-heading { @apply flex min-w-0 items-center gap-5; }
+    .institution-logo { @apply h-20 w-20 shrink-0 object-contain; }
+    .eco-logo { @apply h-20 w-20 shrink-0 object-contain; }
+    .institution-name p { @apply text-lg font-bold tracking-tight text-brand-900; }
+    .institution-name span { @apply mt-1 block text-xs text-slate-500; }
+    .institution-name strong { @apply mt-2 block text-xs font-semibold uppercase tracking-wider text-slate-700; }
+    .system-bar { @apply flex items-center justify-between gap-5 border-b-2 border-institution-red bg-brand-700 px-6 py-3 text-xs text-white; }
+    .system-bar > :first-child { @apply text-sm font-bold tracking-widest; }
+    .section-eyebrow { @apply text-xs font-semibold uppercase tracking-widest text-brand-700; }
+    .section-title { @apply border-b border-slate-200 pb-3 text-base font-semibold text-brand-900; }
+    .institution-link { @apply text-sm font-semibold text-brand-700 underline-offset-4 hover:underline; }
+    .form-alert { @apply mb-6 border border-red-200 border-l-4 border-l-red-700 bg-red-50 p-4 text-sm text-red-900; }
+    .success-alert { @apply mb-6 border border-brand-200 border-l-4 border-l-brand-700 bg-brand-50 p-4 text-sm text-brand-900; }
+    .skip-link { @apply sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-4; }
+
+    /* Institutional access: letterhead, restrained typography, two aligned columns. */
+    .login-page { @apply flex min-h-screen flex-col bg-[#f4f5f7]; }
+    .login-page .institution-header, .login-page .system-bar { padding-inline: max(24px, calc((100vw - 1120px) / 2)); }
+    .login-main { @apply mx-auto grid w-full max-w-6xl flex-1 items-center gap-12 px-6 py-12 lg:grid-cols-[1.15fr_1fr] lg:gap-24 lg:py-16; }
+    .login-introduction h1 { margin-top: 20px; color: var(--color-brand-900); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 3.1vw, 2.9rem); line-height: 1.22; font-weight: 400; }
+    .institution-rule { @apply my-7 h-0.5 w-16 bg-institution-red; }
+    .login-description { @apply max-w-lg text-base leading-7 text-slate-600; }
+    .login-information { @apply mt-9 grid gap-5 border-t border-slate-300 pt-6 text-sm; }
+    .login-information dt { @apply mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500; }
+    .login-information dd { @apply leading-6 text-slate-700; }
+    .login-form-panel { @apply border border-slate-200 border-t-4 border-t-brand-700 bg-white p-7 sm:p-10; }
+    .login-form-heading { @apply mb-8; }
+    .login-form-heading h2 { @apply mt-3 text-2xl font-bold tracking-tight text-brand-900; }
+    .login-form-heading > p:last-child { @apply mt-3 text-sm text-slate-500; }
+    .login-help { @apply mt-8 border-t border-slate-200 pt-6 text-xs leading-6 text-slate-500; }
+    .login-help strong { @apply font-semibold text-slate-700; }
+    .institution-footer { @apply mx-auto flex w-full max-w-6xl flex-wrap justify-between gap-3 border-t border-slate-300 px-6 py-5 text-xs text-slate-500; }
+
+    /* Authenticated workspace shares the same letterhead and palette. */
+    .application-page { @apply bg-[#f4f5f7]; }
+    .application-shell { @apply flex min-h-[calc(100vh-178px)] flex-col md:flex-row; }
+    .application-sidebar { @apply shrink-0 border-b border-slate-200 bg-white md:w-60 md:border-r md:border-b-0; }
+    .navigation-caption { @apply block px-5 pt-6 pb-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500; }
+    .application-sidebar nav { @apply flex flex-wrap px-3 pb-4 md:block; }
+    .nav-link { @apply flex items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm text-slate-600 transition hover:bg-brand-50 hover:text-brand-800; }
+    .nav-link > span { @apply w-5 shrink-0 text-[10px] text-slate-400; }
+    .nav-link.is-active { @apply border-l-brand-700 bg-brand-50 font-semibold text-brand-800; }
+    .sidebar-account { @apply border-t border-slate-200 px-5 py-5; }
+    .sidebar-account .navigation-caption { @apply px-0 pt-0; }
+    .sidebar-account > strong { @apply block text-sm leading-6 text-slate-800; }
+    .sidebar-account > p { @apply mt-1 text-xs leading-5 text-slate-500; }
+    .sidebar-account form { @apply mt-5; }
+    .application-workspace { @apply flex min-w-0 flex-1 flex-col; }
+    .workspace-toolbar { @apply flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-white px-6 py-3 text-xs text-slate-500 lg:px-10; }
+    .workspace-content { @apply mx-auto w-full max-w-7xl flex-1 p-5 lg:p-10; }
+    .page-heading { @apply mb-7 border-b border-slate-300 pb-5; }
+    .page-heading h1 { @apply mt-2 text-2xl font-semibold tracking-tight text-brand-900 lg:text-3xl; }
+    .workspace-footer { @apply border-t border-slate-200 px-6 py-4 text-xs text-slate-500 lg:px-10; }
+    .welcome-panel { @apply flex flex-wrap items-start justify-between gap-5 border border-slate-200 border-l-4 border-l-brand-700 bg-white p-6; }
+    .welcome-panel h2 { @apply mt-3 text-xl font-semibold text-brand-900; }
+    .welcome-panel div > p:last-child { @apply mt-3 max-w-2xl text-sm leading-7 text-slate-600; }
+    .account-status { @apply border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs text-brand-800; }
+    .summary-grid { @apply mt-4 grid border-t border-l border-slate-200 sm:grid-cols-2 xl:grid-cols-4; }
+    .summary-item { @apply border-r border-b border-slate-200 bg-white p-5; }
+    .summary-item p { @apply min-h-10 text-xs font-semibold uppercase leading-5 tracking-wide text-slate-500; }
+    .summary-item strong { @apply mt-2 block text-3xl font-semibold text-brand-700; }
+    .module-notice { @apply mt-5 inline-block border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500; }
+}
+
+@media (min-width: 768px) {
+    .application-page .institution-header { padding-inline: 36px; }
+    .application-page .system-bar { padding-inline: 36px; }
+}
+@media (max-width: 639px) {
+    .institution-header { gap: 10px; padding: 16px; }
+    .institution-heading { gap: 10px; }
+    .institution-logo { width: 58px; height: 58px; }
+    .eco-logo { width: 52px; height: 52px; }
+    .institution-name p { font-size: 12px; line-height: 1.4; }
+    .institution-name span { font-size: 10px; }
+    .institution-name strong { font-size: 9px; letter-spacing: 0; }
+    .system-bar { padding-inline: 16px; font-size: 10px; }
+    .login-main { gap: 32px; padding-block: 32px; }
+    .login-information { display: none; }
+    .login-introduction h1 { font-size: 1.85rem; }
+    .login-description { font-size: 14px; line-height: 1.7; }
+    .institution-rule { margin-block: 18px; }
+    .sidebar-account { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 20px; }
+    .sidebar-account .navigation-caption { display: none; }
+    .sidebar-account > p { margin: 0; }
+    .sidebar-account form { margin: 0 0 0 auto; }
+}

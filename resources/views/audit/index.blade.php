@@ -1,0 +1,6 @@
+@extends('layouts.app')
+@section('title', 'Auditoría institucional')
+@section('content')
+<p class="mb-6 text-sm text-slate-500">Historial de operaciones de acceso y administración. Horas mostradas en America/Guayaquil. Los valores secretos no forman parte de este registro.</p>
+<div class="overflow-x-auto rounded-sm border border-slate-200 bg-white"><table class="w-full text-left text-sm"><caption class="sr-only">Eventos de auditoría</caption><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="p-4">Fecha</th><th class="p-4">Responsable</th><th class="p-4">Acción</th><th class="p-4">Registro</th><th class="p-4">Solicitud</th></tr></thead><tbody class="divide-y divide-slate-100">@forelse($events as $event)<tr><td class="whitespace-nowrap p-4">{{ $event->occurred_at->timezone('America/Guayaquil')->format('d/m/Y H:i:s') }}</td><td class="p-4">{{ $event->actor?->name ?? 'Sistema' }}</td><td class="p-4"><code>{{ $event->action }}</code></td><td class="p-4">{{ $event->entity_type }} #{{ $event->entity_id }}</td><td class="p-4"><code class="text-xs">{{ $event->request_id }}</code></td></tr>@empty<tr><td colspan="5" class="p-10 text-center text-slate-500">Todavía no existen eventos registrados.</td></tr>@endforelse</tbody></table></div><div class="mt-5">{{ $events->links() }}</div>
+@endsection

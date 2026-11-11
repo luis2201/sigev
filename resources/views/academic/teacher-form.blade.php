@@ -1,0 +1,5 @@
+@extends('layouts.app')
+@section('title', 'Perfil académico del docente')
+@section('content')
+<form method="post" action="{{ route('academic.teachers.update',$account) }}" class="card max-w-3xl space-y-6">@csrf @method('put')<div><h2 class="section-title">{{ $account->name }}</h2><p class="mt-3 text-sm text-slate-600">{{ $account->email }}</p><p class="mt-2 text-xs text-slate-500">Esta operación no crea una cuenta nueva ni modifica credenciales.</p></div><div><label for="academic_title">Título académico</label><input id="academic_title" name="academic_title" maxlength="150" value="{{ old('academic_title',$profile?->academic_title) }}"></div>@if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('coordinator'))<div><label for="status">Estado del perfil</label><select name="status" id="status">@foreach(['active'=>'Activo','inactive'=>'Inactivo'] as $v=>$label)<option value="{{ $v }}" @selected(old('status',$profile?->status ?? 'active')===$v)>{{ $label }}</option>@endforeach</select></div>@endif<button class="btn-primary">Guardar perfil académico</button></form>
+@endsection
