@@ -34,7 +34,7 @@ class BootstrapAdmin extends Command
             'name' => trim((string) $this->ask('Nombre completo')),
             'identification_type' => $this->choice('Tipo de identificación', ['cedula', 'pasaporte', 'otro']),
             'identification_number' => trim((string) $this->ask('Identificación')),
-            'email' => mb_strtolower(trim((string) $this->ask('Correo institucional'))),
+            'email' => mb_strtolower(trim((string) $this->ask('Correo electrónico'))),
             'password' => $this->secret('Contraseña segura (mínimo 12 caracteres, mayúsculas, minúsculas, números y símbolos)', false),
             'password_confirmation' => $this->secret('Confirme la contraseña', false),
             'status' => 'active', 'roles' => ['admin'],
@@ -43,7 +43,7 @@ class BootstrapAdmin extends Command
             'name' => ['required', 'string', 'max:200'],
             'identification_type' => ['required', Rule::in(['cedula', 'pasaporte', 'otro'])],
             'identification_number' => ['required', 'string', 'max:30', 'regex:/^[\pL\pN-]+$/u'],
-            'email' => ['required', 'email', 'max:254', 'ends_with:@'.config('sigev.institutional_domain')],
+            'email' => ['required', 'email', 'max:254'],
             'password' => ['required', 'string', 'max:128', 'confirmed', 'different:identification_number', Password::min(12)->mixedCase()->numbers()->symbols()],
         ]);
         if ($validator->fails()) {

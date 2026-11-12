@@ -28,7 +28,7 @@ class SaveUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:200'],
             'identification_type' => ['required', Rule::in(['cedula', 'pasaporte', 'otro'])],
             'identification_number' => ['required', 'string', 'max:30', 'regex:/^[\pL\pN-]+$/u', Rule::unique('users')->where(fn ($q) => $q->where('identification_type', $this->input('identification_type')))->ignore($id)],
-            'email' => ['required', 'email', 'max:254', 'ends_with:@'.config('sigev.institutional_domain'), Rule::unique('users')->ignore($id)],
+            'email' => ['required', 'email', 'max:254', Rule::unique('users')->ignore($id)],
             'status' => ['required', Rule::in(['active', 'inactive', 'suspended'])],
             'roles' => ['present', 'array', $this->isMethod('post') ? 'min:1' : 'min:0'],
             'roles.*' => ['string', 'distinct', Rule::in(array_keys(Role::LABELS))],
@@ -47,6 +47,6 @@ class SaveUserRequest extends FormRequest
 
     public function messages(): array
     {
-        return ['email.ends_with' => 'Utilice un correo del dominio institucional.', 'email.unique' => 'El correo ya está registrado.', 'identification_number.unique' => 'La identificación ya está registrada.', 'required' => 'Este campo es obligatorio.', 'roles.min' => 'Seleccione al menos un rol para la cuenta nueva.'];
+        return ['email.unique' => 'El correo ya está registrado.', 'identification_number.unique' => 'La identificación ya está registrada.', 'required' => 'Este campo es obligatorio.', 'roles.min' => 'Seleccione al menos un rol para la cuenta nueva.'];
     }
 }

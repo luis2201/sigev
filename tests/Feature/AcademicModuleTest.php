@@ -445,4 +445,32 @@ class AcademicModuleTest extends TestCase
         $this->assertSame('Magíster', Teacher::first()->academic_title);
         $this->assertFalse($tutor->fresh()->roles()->exists());
     }
+
+    public function test_import_accepts_personal_and_other_email_domains_and_still_rejects_invalid_addresses(): void
+    {
+        [$admin,,$period] = $this->context();
+        $batch = $this->batch($admin, $period, [
+            $this->row('0001111111', 'alumno@gmail.com'),
+            $this->row('0002222222', 'alumno@hotmail.com'),
+            $this->row('0003333333', 'alumno@otra-institucion.edu.ec'),
+            $this->row('0004444444', 'correo-sin-dominio'),
+        ]);
+        $this->process($admin, $batch);
+        $this->assertSame(3, $batch->rows()->where('status', 'created')->count());
+        $this->assertSame('invalid_email', $batch->rows()->where('row_number', 5)->firstOrFail()->errors['email']);
+        $repeat = $this->batch($admin, $period, [$this->row('0001111111', 'alumno@gmail.com')]);
+        $this->process($admin, $repeat);
+        $this->assertSame('reused', $repeat->rows()->first()->status);
+        $this->assertSame(3, Student::count());
+    }
+
+    public function test_admin_can_create_personal_email_account_without_losing_uniqueness_validation(): void
+    {
+        $admin = $this->account();
+        $data = ['name' => 'Cuenta con correo personal', 'identification_type' => 'cedula', 'identification_number' => '0008887776', 'email' => 'personal@gmail.com', 'status' => 'active', 'roles' => ['tutor']];
+        $this->actingAs($admin)->post(route('users.store'), $data)->assertRedirect();
+        $this->assertTrue(User::where('email', 'personal@gmail.com')->exists());
+        $data['identification_number'] = '0008887775';
+        $this->post(route('users.store'),$data)->assertSessionHasErrors('email');
+    }
 }

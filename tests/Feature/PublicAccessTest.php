@@ -11,7 +11,7 @@ class PublicAccessTest extends TestCase
 {
     public function test_login_page_is_available_without_database_writes(): void
     {
-        $this->get('/login')->assertOk()->assertSee('Correo institucional')->assertSee('SIGEV');
+        $this->get('/login')->assertOk()->assertSee('Correo electrónico')->assertSee('SIGEV');
     }
 
     public function test_guests_cannot_access_administration(): void

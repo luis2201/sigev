@@ -1,5 +1,4 @@
 <?php
 
-return [
-    'institutional_domain' => env('SIGEV_INSTITUTIONAL_DOMAIN', 'itsup.edu.ec'),
-];
+// El correo de acceso admite cualquier dominio válido.
+return [];

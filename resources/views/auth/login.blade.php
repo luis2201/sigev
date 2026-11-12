@@ -20,7 +20,7 @@
             <div class="login-form-heading"><p class="section-eyebrow">Portal de acceso</p><h2 id="login-title">Iniciar sesión</h2><p>Ingrese con su cuenta institucional.</p></div>
             @if($errors->any())<div role="alert" class="form-alert">{{ $errors->first() }}</div>@endif
             <form method="post" action="{{ route('login.store') }}" class="space-y-6">@csrf
-                <div><label for="email">Correo institucional</label><input id="email" name="email" type="email" value="{{ old('email') }}" required maxlength="254" autocomplete="username" autofocus @if($errors->has('email')) aria-invalid="true" @endif></div>
+                <div><label for="email">Correo electrónico</label><input id="email" name="email" type="email" value="{{ old('email') }}" required maxlength="254" autocomplete="username" autofocus @if($errors->has('email')) aria-invalid="true" @endif></div>
                 <div><label for="password">Contraseña</label><input id="password" name="password" type="password" required maxlength="1024" autocomplete="current-password"></div>
                 <button class="btn-primary w-full">Ingresar al sistema <span aria-hidden="true">→</span></button>
             </form>

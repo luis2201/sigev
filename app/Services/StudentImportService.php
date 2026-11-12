@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use League\Flysystem\FilesystemException;
 use Throwable;
 
 class StudentImportService
@@ -35,11 +36,11 @@ class StudentImportService
             'identification_type' => ['required', Rule::in(['cedula', 'pasaporte', 'otro'])],
             'identification_number' => ['required', 'string', 'max:30', 'regex:/^[\pL\pN-]+$/u'],
             'name' => ['required', 'string', 'max:200'],
-            'email' => ['required', 'email', 'max:254', 'ends_with:@'.config('sigev.institutional_domain')],
+            'email' => ['required', 'email', 'max:254'],
             'career_code' => ['required', 'string', 'max:40'],
         ]);
         foreach ($validator->errors()->keys() as $column) {
-            $errors[$column] ??= 'invalid_value';
+            $errors[$column] ??= $column === 'email' ? 'invalid_email' : 'invalid_value';
         }
         if ($period->status === 'closed') {
             $errors['period'] = 'period_closed';
@@ -103,7 +104,11 @@ class StudentImportService
             throw ValidationException::withMessages(['academic_period_id' => 'El período está cerrado.']);
         }
         $rows = $this->inspect($upload->getRealPath(), $period);
-        $key = $upload->storeAs('student-imports', Str::uuid().'.xlsx', 'local');
+        try {
+            $key = $upload->storeAs('student-imports', Str::uuid().'.xlsx', 'local');
+        } catch (FilesystemException $e) {
+            throw ValidationException::withMessages(['file' => 'No se pudo guardar el archivo en el almacenamiento privado. Solicite a la administración revisar los permisos e intente nuevamente.']);
+        }
         if (! $key) {
             throw ValidationException::withMessages(['file' => 'No se pudo almacenar el archivo privado.']);
         }
