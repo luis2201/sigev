@@ -345,3 +345,32 @@ Un cambio de project_id debe bloquear la participación y consultar jornadas/apr
 Se modifican únicamente los cinco archivos de docs/diseno-base-datos indicados en Prompt 003. Se conserva el inventario de 52 tablas y 448 columnas y todas sus relaciones históricas. La validación documental revisa nombres de tablas únicos, destinos/tipos de FK, conservación de columnas y relaciones previas, anotaciones de los tres bloques participations del ERD y coherencia de las tres UNIQUE citadas en catálogo, diccionario, ERD, reglas y JSON. No equivale a ejecutar escenarios sobre MariaDB: no se abre conexión ni se modifica su esquema o datos en esta intervención.
 
 La decisión elimina el pendiente de multiplicidad de participaciones/proyectos, sin contradicciones nuevas de cardinalidad detectadas. Siguen pendientes el contrato para proyecto omitido en importaciones y el procedimiento excepcional de corrección histórica; quedan señalados sin inventar permisos. Los diagramas se conservan como Mermaid textual, sin comprobación visual de renderizado.
+
+## Extensión operativa 007
+
+- Se implementan las FK compuestas previstas para proyectos/períodos, grupos/períodos, áreas/instituciones y aplicaciones individuales/períodos. Se añaden a `participations` y `student_imports` mediante una migración nueva; no se alteran migraciones aplicadas.
+- Un índice UNIQUE sobre una columna generada con participation_id cuando valid_until IS NULL impide dos configuraciones o dos tutores abiertos por participación. Las vigencias solo se abren en el instante efectivo de la operación; no se admiten vigencias futuras o retroactivas desde formularios. La aplicación coordina el cierre y la apertura bajo locks y conserva el mismo límite temporal.
+- La vista previa grupal enumera todos los integrantes, informa conflictos y exige autorización expresa para reemplazar asignaciones existentes. La confirmación repite validaciones y compara el estado revisado; cambios concurrentes invalidan la vista previa. La operación completa es atómica.
+- Se conserva el orden de bloqueo de roles usado por los módulos existentes para sincronizar cambios de permisos; después se bloquean período y participaciones en orden por id. Este lock compartido con administración de períodos impide cambios después del cierre.
+- `teachers.user_id` sigue siendo UNIQUE. `sigev:sync-teacher-profiles` completa únicamente perfiles faltantes para cuentas activas con rol tutor; no cambia cuentas, contraseñas o roles.
+- Las versiones y sus intervalos no se editan ni eliminan mediante operaciones ordinarias. El único cambio permitido sobre vigencias abiertas es finalizarlas. Los catálogos pueden desactivarse sin eliminar historia; sus nombres actuales no reemplazan snapshots.
+- Las fechas del período no pueden reducirse excluyendo prácticas vigentes o históricas. El estudiante consulta únicamente su participación. El docente consulta únicamente sus asignaciones; al perder vigencia mantiene acceso a las versiones correspondientes a su propio intervalo, sin exponer condiciones posteriores.
+
+
+### Actualización: pertenencia única a grupos
+
+Regla confirmada por el usuario el 12/11/2026: **un estudiante solo puede tener un grupo vigente por período**. Sustituye la autorización anterior de pertenencia simultánea. El índice UNIQUE `uq_group_memberships_one_current` sobre la columna generada `current_participation_id` impide duplicidades incluso ante concurrencia. Las pertenencias finalizadas contienen NULL en esa columna y conservan su historia.
+
+La incorporación individual o masiva vuelve a comprobar todas las pertenencias abiertas bajo lock de la participación, no solo las del grupo seleccionado. Si cualquier integrante ya pertenece a otro grupo, se rechaza toda la operación y se informa el grupo actual. El listado de incorporación excluye a estudiantes con cualquier grupo vigente del mismo período. El cambio requiere retirar primero al estudiante del grupo anterior; esa operación conserva su configuración hasta que se aplique expresamente una nueva asignación.
+
+
+## Implementación de jornadas — Prompt 008
+
+- Una entrada ordinaria puede anticiparse al siguiente tramo autorizado del día; la anticipación no suma tiempo elegible y queda registrada como incidencia. No hay tolerancia de minutos inventada. Después de finalizar el último tramo no se abre una asistencia sin tiempo elegible.
+- Una entrada por tramo y jornada, una sola asistencia abierta por participación y control adicional por estudiante. Las solicitudes repetidas conservan las marcas originales mediante UUID únicos y bloqueos transaccionales.
+- Los intervalos guardan los límites UTC autorizados y las referencias históricas al horario. No se reemplaza una asignación con asistencia abierta. Un nuevo horario no modifica las jornadas anteriores.
+- El cierre automático conserva actual_exit_at=NULL y registra provisional_closed_at al límite autorizado, nunca a la hora tardía del proceso. La aprobación ordinaria no acepta una salida provisional; su consideración exige decisión excepcional, circunstancia, justificación y respaldo verificable.
+- La revisión comprende el día completo: cerrado, sin asistencias abiertas y sin tramos diarios posteriores pendientes. Las observaciones no permiten crear actividades retroactivas.
+- Solo el tutor vigente habilitado puede decidir; el antiguo tutor conserva consulta de sus jornadas históricas y autoría. No se admite autoaprobación ni aprobación por jerarquía administrativa.
+- La acreditación suma exclusivamente attendance_days.current_review_id con decisión ordinary/exceptional. Reabrir conserva decisiones anteriores y retira inmediatamente su acreditación efectiva.
+- Las fotografías se normalizan a JPEG privado, con hash SHA-256 verificado para consulta y aprobación ordinaria. Un fallo transaccional elimina el archivo recién creado y revierte actividad, archivo y evidencia.

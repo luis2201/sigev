@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\AcademicPeriod;
 use App\Models\Career;
+use App\Models\PlacementConfiguration;
 use App\Models\Role;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AcademicManager
@@ -40,6 +42,9 @@ class AcademicManager
             }
             if ($data['status'] === 'closed' && $record->exists && $record->imports()->whereIn('status', ['pending', 'validating', 'processing'])->exists()) {
                 throw ValidationException::withMessages(['status' => 'No puede cerrar el período mientras existan importaciones pendientes. Confirme o cancele sus vistas previas.']);
+            }
+            if ($record->exists && Schema::hasTable('placement_configurations') && PlacementConfiguration::where('academic_period_id', $record->id)->where(fn ($query) => $query->where('practice_starts_on', '<', $data['starts_on'])->orWhere('practice_ends_on', '>', $data['ends_on']))->exists()) {
+                throw ValidationException::withMessages(['starts_on' => 'Las fechas del período deben conservar el rango de las prácticas vigentes e históricas.']);
             }
             $record->fill($data);
             if (! $record->exists) {

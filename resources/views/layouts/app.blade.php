@@ -30,6 +30,18 @@
                 @elseif(auth()->user()->hasRole('tutor'))
                     <a class="nav-link {{ request()->routeIs('academic.teachers.*') ? 'is-active' : '' }}" href="{{ route('academic.teachers.edit',auth()->user()) }}">Mi perfil académico</a>
                 @endif
+                @can('manage-placements')
+                    <span class="navigation-caption">Gestión operativa</span>
+                    @foreach(\App\Services\OperationalCatalogManager::CATALOGS as $key=>$catalog)
+                    <a class="nav-link {{ request()->route('catalog')===$key?'is-active':'' }}" href="{{ route('operational.catalog.index',$key) }}">{{ $catalog[1] }}</a>
+                    @endforeach
+                    <a class="nav-link {{ request()->routeIs('operational.assignments.*')?'is-active':'' }}" href="{{ route('operational.assignments.index') }}">Asignaciones y horarios</a>
+                @endcan
+                @if(auth()->user()->hasRole('student'))<a class="nav-link" href="{{ route('operational.mine') }}">Mi vinculación</a>@endif
+                @if(auth()->user()->hasRole('tutor'))<a class="nav-link" href="{{ route('operational.students') }}">Mis estudiantes</a>@endif
+                @if(auth()->user()->hasRole('student') || auth()->user()->hasRole('tutor') || auth()->user()->hasRole('coordinator'))
+                    <a class="nav-link {{ request()->routeIs('attendance.*')?'is-active':'' }}" href="{{ route('attendance.index') }}">{{ auth()->user()->hasRole('student')?'Mis jornadas':(auth()->user()->hasRole('tutor')?'Revisión de jornadas':'Jornadas de vinculación') }}</a>
+                @endif
             @endunless
             <a class="nav-link {{ request()->routeIs('password.*') ? 'is-active' : '' }}" @if(request()->routeIs('password.*')) aria-current="page" @endif href="{{ route('password.edit') }}"><span aria-hidden="true">•</span>Mi perfil y seguridad</a>
         </nav>

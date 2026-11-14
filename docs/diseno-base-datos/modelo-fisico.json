@@ -1130,6 +1130,14 @@
           "note": ""
         },
         {
+          "name": "normalized_name",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Extensión 007: nombre sin espacios/puntuación, normalizado para evitar duplicados menores."
+        },
+        {
           "name": "created_at",
           "type": "DATETIME(6)",
           "null": "No",
@@ -1146,7 +1154,7 @@
           "note": "Última actualización; solo entidades mutables"
         }
       ],
-      "unique": "code",
+      "unique": "code; normalized_name",
       "indexes": "(status,name)",
       "rules": "Renombrar catálogo no modifica snapshots históricos de configuración."
     },
@@ -1207,6 +1215,96 @@
       "unique": "(host_institution_id,name); (id,host_institution_id)",
       "indexes": "",
       "rules": "No aceptar un área de institución distinta."
+    },
+    {
+      "name": "institutional_tutors",
+      "domain": "Coordinación",
+      "purpose": "Extensión 007: catálogo de responsables externos, sin cuenta de usuario ni rol tutor.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "AUTO_INCREMENT",
+          "fk": "",
+          "note": "PK"
+        },
+        {
+          "name": "host_institution_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "host_institutions.id",
+          "note": ""
+        },
+        {
+          "name": "institution_area_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "institution_areas.id",
+          "note": ""
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(200)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "normalized_name",
+          "type": "VARCHAR(200)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(254)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "phone",
+          "type": "VARCHAR(30)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "null": "No",
+          "default": "active",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME(6)",
+          "null": "No",
+          "default": "Servidor UTC",
+          "fk": "",
+          "note": ""
+        }
+      ],
+      "unique": "(host_institution_id,normalized_name)",
+      "indexes": "(institution_area_id,host_institution_id)",
+      "rules": "active/inactive. Área opcional de la misma institución mediante FK compuesta. No trasladar a otra institución; conservar snapshots en versiones."
     },
     {
       "name": "placement_groups",
@@ -1350,11 +1448,19 @@
           "default": "Servidor UTC",
           "fk": "",
           "note": "Creación"
+        },
+        {
+          "name": "current_participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "GENERATED STORED",
+          "fk": "",
+          "note": "Extensión 007: CASE WHEN valid_until IS NULL THEN participation_id ELSE NULL END; columna técnica no editable."
         }
       ],
-      "unique": "(placement_group_id,participation_id,valid_from)",
+      "unique": "(placement_group_id,participation_id,valid_from); (placement_group_id,current_participation_id); current_participation_id",
       "indexes": "(participation_id,valid_from,valid_until)",
-      "rules": "CHECK fin > inicio. FK compuestas mismo período; impedir membresías simultáneas incompatibles en transacción."
+      "rules": "CHECK fin > inicio. FK compuestas mismo período. Regla confirmada 12/11/2026: una sola pertenencia vigente por participación (y por estudiante/período). UNIQUE(current_participation_id) permite conservar filas históricas con NULL. Para cambiar de grupo, finalizar primero la pertenencia anterior. Mantener motivo y auditoría."
     },
     {
       "name": "tutor_assignments",
@@ -1424,9 +1530,17 @@
           "default": "Servidor UTC",
           "fk": "",
           "note": "Creación"
+        },
+        {
+          "name": "current_participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "GENERATED STORED",
+          "fk": "",
+          "note": "Extensión 007: CASE WHEN valid_until IS NULL THEN participation_id ELSE NULL END; columna técnica no editable."
         }
       ],
-      "unique": "(participation_id,valid_from); (id,participation_id)",
+      "unique": "(participation_id,valid_from); (id,participation_id); current_participation_id",
       "indexes": "(teacher_id,valid_until); (participation_id,valid_from,valid_until)",
       "rules": "CHECK fin > inicio. Una vigencia efectiva por participación; bloquear participación al reasignar. Autores históricos nunca se recalculan con tutor actual."
     },
@@ -1580,6 +1694,30 @@
           "note": ""
         },
         {
+          "name": "institutional_tutor_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "institutional_tutors.id",
+          "note": "Extensión 007: catálogo seleccionado; mantener también institutional_tutor_name histórico."
+        },
+        {
+          "name": "project_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "projects.id",
+          "note": "Extensión 007: proyecto de esta versión; FK compuesta con período."
+        },
+        {
+          "name": "project_name_snapshot",
+          "type": "VARCHAR(255)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "Extensión 007: nombre histórico del proyecto."
+        },
+        {
           "name": "created_at",
           "type": "DATETIME(6)",
           "null": "No",
@@ -1668,9 +1806,17 @@
           "default": "Servidor UTC",
           "fk": "",
           "note": "Creación"
+        },
+        {
+          "name": "current_participation_id",
+          "type": "BIGINT UNSIGNED",
+          "null": "Sí",
+          "default": "GENERATED STORED",
+          "fk": "",
+          "note": "Extensión 007: CASE WHEN valid_until IS NULL THEN participation_id ELSE NULL END; columna técnica no editable."
         }
       ],
-      "unique": "(participation_id,valid_from); (id,participation_id)",
+      "unique": "(participation_id,valid_from); (id,participation_id); current_participation_id",
       "indexes": "(participation_id,valid_from,valid_until)",
       "rules": "CHECK fin > inicio; FK compuestas mismo período; exactamente una configuración efectiva para poder marcar. No exigir que exista antes de completar asignación."
     },
@@ -1933,11 +2079,11 @@
         },
         {
           "name": "closure_type",
-          "type": "VARCHAR(20)",
+          "type": "VARCHAR(30)",
           "null": "Sí",
           "default": "NULL",
           "fk": "",
-          "note": ""
+          "note": "manual o automatic_provisional; longitud corregida en Prompt 008"
         },
         {
           "name": "mark_status",
@@ -1970,6 +2116,30 @@
           "default": "Servidor UTC",
           "fk": "",
           "note": "Última actualización; solo entidades mutables"
+        },
+        {
+          "name": "entry_request_key",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "UUID único de idempotencia de entrada"
+        },
+        {
+          "name": "exit_request_key",
+          "type": "CHAR(36)",
+          "null": "Sí",
+          "default": "NULL",
+          "fk": "",
+          "note": "UUID único de idempotencia de salida"
+        },
+        {
+          "name": "open_participation_id",
+          "type": "BIGINT UNSIGNED GENERATED STORED",
+          "null": "Sí",
+          "default": "Generado",
+          "fk": "",
+          "note": "CASE WHEN mark_status='open' THEN participation_id ELSE NULL END; UNIQUE impide dos intervalos abiertos"
         }
       ],
       "unique": "(attendance_day_id,schedule_interval_id)",
@@ -2306,6 +2476,14 @@
           "default": "Servidor UTC",
           "fk": "",
           "note": "Creación"
+        },
+        {
+          "name": "request_key",
+          "type": "CHAR(36)",
+          "null": "No",
+          "default": "Sin predeterminado",
+          "fk": "",
+          "note": "UUID único de idempotencia de revisión"
         }
       ],
       "unique": "(attendance_day_id,sequence_number); (id,attendance_day_id)",
@@ -4124,6 +4302,34 @@
     "attendance_day_unique": [
       "participation_id",
       "local_date"
+    ]
+  },
+  "implementation_007": {
+    "date": "2026-11-12",
+    "migration": "2026_11_12_194141_create_operational_placement_tables",
+    "notes": [
+      "projects reutilizada, sin crear otra tabla.",
+      "Cada integrante recibe su propia línea de versiones, identificada por configuration_key; la aplicación grupal conserva placement_group_id. Reemplazar un integrante no altera a los demás.",
+      "FK compuestas incrementales completan proyecto/período, grupo/período, área/institución y participación/configuración/período.",
+      "No se implementan jornadas, marcaciones ni acreditación de horas."
+    ]
+  },
+  "confirmed_group_membership_rule": {
+    "date": "2026-11-12",
+    "maximum_current_groups_per_student_and_period": 1,
+    "database_constraint": "group_memberships UNIQUE(current_participation_id)",
+    "migration": "2026_11_12_213534_enforce_single_active_group_per_participation",
+    "existing_duplicates": "conservar grupo de configuración vigente si tiene pertenencia activa; en otro caso, la pertenencia vigente más antigua; cerrar otras sin borrar historial ni cambiar configuración"
+  },
+  "implementation_008": {
+    "date": "2026-11-13",
+    "migration": "2026_11_13_201111_create_attendance_activity_and_review_tables",
+    "technical_adjustments": [
+      "closure_type VARCHAR(30) admite automatic_provisional",
+      "UUID únicos para reintentos de entrada, salida y revisión",
+      "open_participation_id generado único",
+      "FK compuesta revisión efectiva/jornada",
+      "FK compuestas conservan pertenencia de marcaciones, configuración, tutor y jornada"
     ]
   }
 }

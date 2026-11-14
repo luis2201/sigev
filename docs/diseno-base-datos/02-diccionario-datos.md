@@ -522,7 +522,7 @@ Marcación por tramo y copia histórica de límites autorizados.
 | `actual_entry_at` | `DATETIME(6)` | No | Sin predeterminado | — | Valor de actual_entry_at según reglas de esta tabla |
 | `actual_exit_at` | `DATETIME(6)` | Sí | NULL | — | Valor de actual_exit_at según reglas de esta tabla |
 | `provisional_closed_at` | `DATETIME(6)` | Sí | NULL | — | Valor de provisional_closed_at según reglas de esta tabla |
-| `closure_type` | `VARCHAR(20)` | Sí | NULL | — | Valor de closure_type según reglas de esta tabla |
+| `closure_type` | `VARCHAR(30)` | Sí | NULL | — | Valor de closure_type según reglas de esta tabla |
 | `mark_status` | `VARCHAR(25)` | No | open | — | Valor de mark_status según reglas de esta tabla |
 | `computable_minutes` | `DECIMAL(10,6)` | Sí | NULL | — | Valor de computable_minutes según reglas de esta tabla |
 | `created_at` | `DATETIME(6)` | No | Servidor UTC | — | Creación |
@@ -1141,3 +1141,43 @@ Control técnico creado por migrador cuando se autorice.
 
 **Integridad y relaciones:** No contiene negocio. No crear ni ejecutar en esta intervención. Todas las FK de la tabla, sus cardinalidades y destinos figuran también en el ERD. Aplicar las FK compuestas del documento 4 además de estas referencias simples cuando corresponda.
 
+
+## Extensión implementada en Prompt 007 — 12/11/2026
+
+La migración incremental `2026_11_12_194141_create_operational_placement_tables` reutiliza `projects` y materializa las ocho tablas operativas previstas: `host_institutions`, `institution_areas`, `placement_groups`, `group_memberships`, `tutor_assignments`, `placement_configurations`, `participation_configurations` y `schedule_intervals`.
+
+Para satisfacer el registro reutilizable de tutores institucionales y la conservación del proyecto histórico se incorporan estas ampliaciones, reflejadas también en `modelo-fisico.json`:
+
+| Tabla / campo | Tipo | Restricción y finalidad |
+|---|---|---|
+| `host_institutions.normalized_name` | VARCHAR(255), NOT NULL | UNIQUE; comparación sin espacios, puntuación o diferencias de mayúsculas y acentos. |
+| `institutional_tutors` | Catálogo nuevo | PK BIGINT; institución obligatoria; área opcional de esa misma institución; nombre VARCHAR(200), nombre normalizado VARCHAR(200), correo opcional VARCHAR(254), teléfono opcional VARCHAR(30), estado active/inactive, timestamps DATETIME(6). UNIQUE(institución, nombre normalizado). No referencia a users. |
+| `placement_configurations.institutional_tutor_id` | BIGINT UNSIGNED, NOT NULL | FK restrict al catálogo externo; `institutional_tutor_name` conserva el nombre histórico. |
+| `placement_configurations.project_id` | BIGINT UNSIGNED, NOT NULL | FK compuesta con período a projects. Conserva qué proyecto correspondía a esta versión. |
+| `placement_configurations.project_name_snapshot` | VARCHAR(255), NOT NULL | Nombre histórico e inmutable del proyecto. |
+| `tutor_assignments.current_participation_id` | BIGINT UNSIGNED, GENERATED STORED | Participación si valid_until IS NULL; NULL en filas históricas. UNIQUE impide dos tutores vigentes. |
+| `participation_configurations.current_participation_id` | BIGINT UNSIGNED, GENERATED STORED | Misma expresión y UNIQUE para impedir dos configuraciones vigentes. |
+| `group_memberships.current_participation_id` | BIGINT UNSIGNED, GENERATED STORED | UNIQUE(current_participation_id), añadido en la migración 2026_11_12_213534, impide pertenecer simultáneamente a varios grupos en el mismo período. UNIQUE(group, current_participation_id) se conserva como restricción previa. |
+
+La configuración grupal se aplica transaccionalmente mediante una línea de versiones por integrante. Todas conservan el grupo de origen. Así, cambiar individualmente a un estudiante no finaliza la configuración de los demás. Las vigencias de configuración y tutoría usan instantes UTC; las horas semanales y fechas civiles corresponden a America/Guayaquil. Los extremos de fechas de intervalos semanales son inclusivos; las vigencias temporales de asignaciones son [inicio, fin).
+
+
+### Regla confirmada: un grupo vigente por período
+
+Desde la confirmación del 12/11/2026 se permite una sola pertenencia vigente por participación. Como participations ya tiene UNIQUE(student_id, academic_period_id), la restricción equivale a un solo grupo vigente por estudiante y período. Se admite otro grupo en otro período o cambiar de grupo después de finalizar la pertenencia anterior. Las filas históricas permanecen.
+
+La migración incremental `2026_11_12_213534_enforce_single_active_group_per_participation` regulariza duplicidades conservando el grupo de la asignación vigente cuando figura entre las pertenencias activas; si no existe esa coincidencia, conserva la más antigua. Cierra las demás con auditoría de sistema y añade UNIQUE(current_participation_id). No modifica horarios, docentes ni proyectos. Su rollback elimina únicamente el índice; no reabre pertenencias finalizadas.
+
+
+## Ajustes técnicos ejecutables del Prompt 008
+
+La migración incremental `2026_11_13_201111_create_attendance_activity_and_review_tables` incorpora las siete tablas de jornadas. Reutiliza `private_files` y las configuraciones históricas del módulo operativo.
+
+| Tabla | Campo adicional | Tipo / restricción | Propósito |
+|---|---|---|---|
+| attendance_intervals | entry_request_key | CHAR(36) NOT NULL UNIQUE | Reintentos de entrada sin duplicados |
+| attendance_intervals | exit_request_key | CHAR(36) NULL UNIQUE | Reintentos de salida sin modificar la marca original |
+| attendance_intervals | open_participation_id | BIGINT UNSIGNED GENERATED STORED UNIQUE | Participación solo cuando mark_status=open; una asistencia abierta |
+| attendance_reviews | request_key | CHAR(36) NOT NULL UNIQUE | Reintentos de revisión sin duplicar decisiones |
+
+`closure_type` se amplía a VARCHAR(30) para admitir el código aprobado `automatic_provisional` (21 caracteres). Se conserva la precisión DECIMAL(10,6) del diseño; los cálculos usan segundos enteros y la suma usa unidades enteras de millonésima de minuto. Las FK compuestas garantizan que jornada, participación, configuración, intervalo, tutor y revisión efectiva pertenezcan al mismo contexto. El índice adicional de `participation_configurations(id, placement_configuration_id)` permite validar dicha referencia sin modificar migraciones ejecutadas.
